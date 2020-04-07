@@ -17,6 +17,7 @@ const {
   deleteComment,
   register,
   login,
+  logout,
 } = require("../routeHandlers/routes");
 
 const { authentication } = require("../middlewares/auth");
@@ -53,5 +54,7 @@ Router.route("/comment/:id")
 Router.route("/register").post(register);
 
 Router.route("/login").post(login);
+
+Router.route("/logout").post(logout);
 
 module.exports = Router;

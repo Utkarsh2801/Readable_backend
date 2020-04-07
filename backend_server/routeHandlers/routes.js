@@ -129,6 +129,10 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
 
   let data = await Posts.findById(req.params.id);
 
+  if (!data) {
+    return next(new ErrorResponse("Resource Not Found", 404));
+  }
+
   if (data.author.toString() !== req.user.id.toString()) {
     return next(new ErrorResponse("Unauthorized access", 401));
   }
@@ -136,10 +140,6 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
   data = await Posts.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
   });
-
-  if (!data) {
-    return next(new ErrorResponse("Resource Not Found", 404));
-  }
 
   res.status(200).json({
     success: true,
@@ -328,4 +328,12 @@ exports.login = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse("Invalid Credentials", 401));
   }
   return;
+});
+
+exports.logout = asyncHandler(async (req, res, next) => {
+  res.cookie("auth", "");
+  res.status(200).json({
+    success: true,
+    msg: "you are successfully logged out",
+  });
 });
