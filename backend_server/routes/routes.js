@@ -19,29 +19,36 @@ const {
   login,
 } = require("../routeHandlers/routes");
 
+const { authentication } = require("../middlewares/auth");
+
 const Router = express.Router();
 
-Router.route("/categories").get(getCategories);
+Router.route("/categories").get(authentication, getCategories);
 
-Router.route("/:category/posts").get(postForCategory);
+Router.route("/:category/posts").get(authentication, postForCategory);
 
-Router.route("/posts").get(getAllPost).post(addPost);
+Router.route("/posts")
+  .get(authentication, getAllPost)
+  .post(authentication, addPost);
 
 Router.route("/posts/:id")
-  .get(singlePost)
-  .post(votePost)
-  .put(updatePost)
-  .delete(deletePost);
+  .get(authentication, singlePost)
+  .post(authentication, votePost)
+  .put(authentication, updatePost)
+  .delete(authentication, deletePost);
 
-Router.route("/posts/:postId/comments").get(commentsForSinglePost);
+Router.route("/posts/:postId/comments").get(
+  authentication,
+  commentsForSinglePost
+);
 
-Router.route("/comment").post(addComment);
+Router.route("/comment").post(authentication, addComment);
 
 Router.route("/comment/:id")
-  .get(getSingleComment)
-  .post(voteComment)
-  .put(updateComment)
-  .delete(deleteComment);
+  .get(authentication, getSingleComment)
+  .post(authentication, voteComment)
+  .put(authentication, updateComment)
+  .delete(authentication, deleteComment);
 
 Router.route("/register").post(register);
 

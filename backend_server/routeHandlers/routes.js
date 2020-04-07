@@ -26,7 +26,6 @@ exports.postForCategory = asyncHandler(async (req, res, next) => {
     category: category,
   }).populate("posts");
 
-  console.log(data);
   if (!data) {
     return next(new ErrorResponse("Resource Not Found", 404));
   }
@@ -51,6 +50,10 @@ exports.getAllPost = asyncHandler(async (req, res, next) => {
 });
 
 exports.addPost = asyncHandler(async (req, res, next) => {
+  if (!req.user) {
+    return next(new ErrorResponse("Please login or register first", 401));
+  }
+
   let data = await Posts.create(req.body);
 
   if (!data) {
@@ -77,6 +80,9 @@ exports.singlePost = asyncHandler(async (req, res, next) => {
 });
 
 exports.votePost = asyncHandler(async (req, res, next) => {
+  if (!req.user) {
+    return next(new ErrorResponse("Please login or register first", 401));
+  }
   let option = req.body.option;
   let quantity;
 
@@ -151,6 +157,9 @@ exports.commentsForSinglePost = asyncHandler(async (req, res, next) => {
 });
 
 exports.addComment = asyncHandler(async (req, res, next) => {
+  if (!req.user) {
+    return next(new ErrorResponse("Please login or register first", 401));
+  }
   let data = await Comments.create(req.body);
 
   if (!data) {
@@ -177,6 +186,9 @@ exports.getSingleComment = asyncHandler(async (req, res, next) => {
 });
 
 exports.voteComment = asyncHandler(async (req, res, next) => {
+  if (!req.user) {
+    return next(new ErrorResponse("Please login or register first", 401));
+  }
   let option = req.body.option;
   let quantity;
 

@@ -11,13 +11,11 @@ const xss = require("xss-clean");
 const helmet = require("helmet");
 const cors = require("cors");
 const sanitize = require("express-mongo-sanitize");
-const { authentication } = require("./middlewares/auth");
 mongoConnect();
 
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(cookieParser());
-app.use(authentication);
 app.use("/", routes);
 
 // sanetize data
