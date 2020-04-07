@@ -17,7 +17,7 @@ const categorySchema = mongoose.Schema(
 categorySchema.virtual("posts", {
   ref: "Post",
   localField: "_id",
-  foreignField: "category",
+  foreignField: "categoryId",
   justOne: false,
 });
 

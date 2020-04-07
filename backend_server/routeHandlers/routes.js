@@ -26,6 +26,7 @@ exports.postForCategory = asyncHandler(async (req, res, next) => {
     category: category,
   }).populate("posts");
 
+  console.log(data);
   if (!data) {
     return next(new ErrorResponse("Resource Not Found", 404));
   }
