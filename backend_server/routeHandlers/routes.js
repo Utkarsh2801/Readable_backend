@@ -54,6 +54,8 @@ exports.addPost = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse("Please login or register first", 401));
   }
 
+  req.body.author = req.user._id;
+
   let data = await Posts.create(req.body);
 
   if (!data) {
@@ -83,6 +85,7 @@ exports.votePost = asyncHandler(async (req, res, next) => {
   if (!req.user) {
     return next(new ErrorResponse("Please login or register first", 401));
   }
+
   let option = req.body.option;
   let quantity;
 
@@ -95,17 +98,23 @@ exports.votePost = asyncHandler(async (req, res, next) => {
     });
   }
 
-  let data = await Posts.findByIdAndUpdate(
+  let data = await Posts.findById(req.params.id);
+
+  if (!data) {
+    return next(new ErrorResponse("Resource Not Found", 404));
+  }
+
+  if (data.author.toString() === req.user.id.toString()) {
+    return next(new ErrorResponse("Unauthorized access", 401));
+  }
+
+  data = await Posts.findByIdAndUpdate(
     req.params.id,
     { $inc: { votescore: quantity } },
     {
       new: true,
     }
   );
-
-  if (!data) {
-    return next(new ErrorResponse("Resource Not Found", 404));
-  }
 
   res.status(200).json({
     success: true,
@@ -114,7 +123,17 @@ exports.votePost = asyncHandler(async (req, res, next) => {
 });
 
 exports.updatePost = asyncHandler(async (req, res, next) => {
-  let data = await Posts.findByIdAndUpdate(req.params.id, req.body, {
+  if (!req.user) {
+    return next(new ErrorResponse("Please login or register first", 401));
+  }
+
+  let data = await Posts.findById(req.params.id);
+
+  if (data.author.toString() !== req.user.id.toString()) {
+    return next(new ErrorResponse("Unauthorized access", 401));
+  }
+
+  data = await Posts.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
   });
 
@@ -129,7 +148,15 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
 });
 
 exports.deletePost = asyncHandler(async (req, res, next) => {
+  if (!req.user) {
+    return next(new ErrorResponse("Please login or register first", 401));
+  }
+
   let data = await Posts.findById(req.params.id);
+
+  if (data.author.toString() !== req.user.id.toString()) {
+    return next(new ErrorResponse("Unauthorized access", 401));
+  }
 
   if (!data) {
     return next(new ErrorResponse("Resource Not Found", 404));
@@ -160,6 +187,7 @@ exports.addComment = asyncHandler(async (req, res, next) => {
   if (!req.user) {
     return next(new ErrorResponse("Please login or register first", 401));
   }
+
   let data = await Comments.create(req.body);
 
   if (!data) {
@@ -220,13 +248,24 @@ exports.voteComment = asyncHandler(async (req, res, next) => {
 });
 
 exports.updateComment = asyncHandler(async (req, res, next) => {
-  let data = await Comments.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-  });
+  if (!req.user) {
+    return next(new ErrorResponse("Please login or register first", 401));
+  }
+
+  let data = await Comments.findById(req.params.id);
 
   if (!data) {
     return next(new ErrorResponse("Resource Not Found", 404));
   }
+
+  if (data.author.toString() !== req.user.id.toString()) {
+    return next(new ErrorResponse("Unauthorized access", 401));
+  }
+
+  data = await Comments.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
+
   res.status(200).json({
     success: true,
     data: data,
@@ -234,7 +273,21 @@ exports.updateComment = asyncHandler(async (req, res, next) => {
 });
 
 exports.deleteComment = asyncHandler(async (req, res, next) => {
-  let data = await Comments.deleteOne({ _id: req.params.id });
+  if (!req.user) {
+    return next(new ErrorResponse("Please login or register first", 401));
+  }
+
+  let data = await Comments.findById(req.params.id);
+
+  if (!data) {
+    return next(new ErrorResponse("Resource Not Found", 404));
+  }
+
+  if (data.author.toString() !== req.user.id.toString()) {
+    return next(new ErrorResponse("Unauthorized access", 401));
+  }
+
+  data = await Comments.deleteOne({ _id: req.params.id });
 
   if (!data) {
     return next(new ErrorResponse("Resource Not Found", 404));

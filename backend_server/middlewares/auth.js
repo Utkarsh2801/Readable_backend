@@ -13,9 +13,3 @@ exports.authentication = asyncHandler(async (req, res, next) => {
   }
   next();
 });
-
-exports.protect = asyncHandler(async (req, res, next) => {
-  if (req.user) {
-  }
-  next();
-});
