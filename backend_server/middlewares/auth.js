@@ -9,7 +9,6 @@ exports.authentication = asyncHandler(async (req, res, next) => {
     let token = req.cookies.auth;
     decode = await jwt.verify(token, jwtSectret);
     req.user = await Users.findById(decode.id);
-    console.log(req.user);
   }
   next();
 });
